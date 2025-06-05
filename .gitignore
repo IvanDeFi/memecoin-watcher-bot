@@ -1,13 +1,19 @@
-# Ignore Python cache
+# Python cache
 __pycache__/
-*.pyc
+*.py[cod]
 
-# Ignore environment files
+# Env files
 .env
-.env.local
-config.yaml
-*.log
+*.env
 
-# VS Code / IDE settings
+# IDEs
 .vscode/
 .idea/
+
+# Sessions, logs, outputs
+sessions/
+output/
+*.log
+
+# Mac system files
+.DS_Store
