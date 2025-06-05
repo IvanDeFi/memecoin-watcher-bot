@@ -1,1 +1,13 @@
-# API keys and bot configuration
+network:
+  solana_enabled: true
+  ethereum_enabled: true
+
+limits:
+  max_tokens: 5
+  delay_between_posts: 30  # seconds
+
+posting:
+  mode: "local"  # or "twitter"
+
+paths:
+  tweet_output_dir: "output/"

@@ -1,3 +1,5 @@
 requests
-PyYAML
-playwright
+python-dotenv
+pyyaml
+schedule
+selenium
