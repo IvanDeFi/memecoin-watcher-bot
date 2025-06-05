@@ -1,38 +1,56 @@
-# memecoin-watcher-bot
 # 🧠 Memecoin Watcher Bot — Solana & Ethereum
 
-A smart bot that monitors **new memecoins** on **Solana and Ethereum** and auto-generates tweet content.
+A smart, scalable bot that tracks **new memecoin launches** on **Solana and Ethereum**, generates tweet content, and publishes it via a **Twitter bot farm** — all without using the X API.
+
+---
 
 ## 📌 What the bot does:
 
-1. Tracks new token launches using APIs (Birdeye, Pump.fun, Dexscreener, DEXTools, etc.)
-2. Collects important token data: name, ticker, contract, liquidity, volume
-3. Generates a tweet (funny, factual, or meme-style)
-4. Posts the tweet automatically (or saves it)
+1. Tracks new token launches using APIs:
+   - [Pump.fun](https://pump.fun)
+   - [Birdeye](https://birdeye.so)
+   - [Dexscreener](https://docs.dexscreener.com/)
+   - [Alchemy / Infura for Ethereum](https://www.alchemy.com/)
+2. Collects data:
+   - Token name, ticker, contract address
+   - Liquidity, volume, launch time
+3. Generates tweet text:
+   - Meme-style 🐸
+   - Informational 🧠
+   - Viral 🚀
+4. Tweets via **multiple Twitter accounts**:
+   - In parallel (multi-threaded)
+   - Based on a publishing plan or rotation
+   - Supports manual review of tweets
+5. No Twitter/X API required — supports headless browser login (playwright/selenium)
 
-## ⚙️ Requirements:
+---
+
+## 🧪 Developer Test Task
+
+To qualify, please submit a simple Python script that:
+
+1. Fetches recent token launches from **Pump.fun** or **Birdeye**
+2. Picks top 3 by liquidity or volume
+3. Generates tweet-style messages like:
+
+   > 🚀 New memecoin $DOGEPEPE just launched on Solana — 40k in 20 min!  
+   > Is this the next SHIBA? 🐶💰 #Solana #Memecoin
+
+4. Saves them to `output/tweet.txt`
+
+---
+
+## ⚙️ Tech Requirements
 
 - Python 3.9+
-- APIs used:
-  - [Pump.fun](https://pump.fun)
-  - [Birdeye](https://birdeye.so)
-  - [Dexscreener](https://docs.dexscreener.com/)
-  - [Alchemy / Infura for Ethereum](https://www.alchemy.com/)
-- No Twitter/X API required (headless browser or local save is enough)
+- YAML for configuration
+- Threading or asyncio (for multi-bot posting)
+- Browser automation (e.g., playwright or selenium)
+- File structure for config, queue, accounts, and tweets
 
-## 🧪 Test Task for Developers
+---
 
-Please submit a simple Python script that does the following:
+## 🧱 Project Structure
 
-1. Fetches a list of new tokens from **Pump.fun** or similar source
-2. Picks top 3 tokens by liquidity or volume
-3. Generates tweet-like text, such as:
-
-   > "🔥 New memecoin launched on Solana: $DOGEPEPE — 40k volume in 20 min! Is this the next SHIBA? 🐶🚀 #Solana #Memecoin"
-
-4. Saves the tweet text to a file `output/tweet.txt`
-
-If you can complete this task — you’re likely a great fit. 🙌
-
-## 📁 Project Structure (suggested)
 
