@@ -1,5 +1,2 @@
 requests
-python-dotenv
 pyyaml
-schedule
-selenium
