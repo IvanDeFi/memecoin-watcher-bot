@@ -1,2 +1,6 @@
 requests
 pyyaml
+schedule
+matplotlib
+python-dotenv
+python-telegram-bot
