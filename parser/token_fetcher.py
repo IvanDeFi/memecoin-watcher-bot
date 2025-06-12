@@ -1,70 +1,82 @@
 # parser/token_fetcher.py
+import os
 import requests
 from datetime import datetime, timezone
 from utils.logger import logger
 
-def fetch_from_pumpfun(limit=20):
-    url = "https://pump.fun/api/token/list"
+PUMP_FUN_API_KEY = os.getenv("PUMP_FUN_API_KEY")
+BIRDEYE_API_KEY = os.getenv("BIRDEYE_API_KEY")
+
+
+def fetch_new_tokens(chain: str):
+    """
+    Fetches recent memecoins from public APIs.
+    Supported chains: "solana", "ethereum".
+    Returns a list of tokens with unified structure.
+    """
+    if chain.lower() == "solana":
+        return fetch_solana_tokens()
+    elif chain.lower() == "ethereum":
+        return fetch_ethereum_tokens()
+    else:
+        logger.warning(f"[fetch_new_tokens] Unsupported chain: {chain}")
+        return []
+
+
+def fetch_solana_tokens():
     try:
-        response = requests.get(url)
+        url = "https://client-api.pump.fun/tokens/trending"
+        headers = {"x-api-key": PUMP_FUN_API_KEY} if PUMP_FUN_API_KEY else {}
+        response = requests.get(url, headers=headers)
         response.raise_for_status()
         data = response.json()
 
         tokens = []
-        for item in data[:limit]:
+        for item in data:
+            created_at = datetime.fromisoformat(item["createdAt"].replace("Z", "+00:00"))
+            age_minutes = (datetime.now(timezone.utc) - created_at).total_seconds() / 60
+
             tokens.append({
-                "ticker": item.get("ticker", "???"),
+                "ticker": item.get("ticker", "UNKNOWN"),
                 "liquidity": item.get("liquidity", 0),
-                "volume_30m": item.get("volume_30m", 0),
-                "age_minutes": calc_age_minutes(item.get("launchUnix")),
-                "contract_address": item.get("id"),
-                "chain": "Solana",
-                "source": "Pump.fun",
-                "deployer": item.get("creator", "unknown")
+                "volume_30m": item.get("volume", 0),
+                "age_minutes": int(age_minutes),
+                "contract_address": item.get("id", ""),
+                "deployer": "unknown",
+                "chain": "Solana"
             })
+
+        logger.info(f"Fetched {len(tokens)} Solana tokens")
         return tokens
+
     except Exception as e:
-        logger.error(f"Pump.fun fetch failed: {e}")
+        logger.error(f"Failed to fetch Solana tokens: {e}")
         return []
 
-def fetch_from_birdeye(limit=20):
-    url = "https://public-api.birdeye.so/public/tokenlist?sort_by=volume_1h"
-    headers = {"X-API-KEY": "YOUR_BIRDEYE_API_KEY"}
+
+def fetch_ethereum_tokens():
     try:
+        url = "https://public-api.birdeye.so/public/tokenlist?chain=ethereum"
+        headers = {"X-API-KEY": BIRDEYE_API_KEY} if BIRDEYE_API_KEY else {}
         response = requests.get(url, headers=headers)
         response.raise_for_status()
-        data = response.json().get("data", [])
+        data = response.json().get("data", {}).get("tokens", [])
 
         tokens = []
-        for item in data[:limit]:
+        for item in data:
             tokens.append({
-                "ticker": item.get("symbol", "???"),
+                "ticker": item.get("symbol", "UNKNOWN"),
                 "liquidity": item.get("liquidity", 0),
-                "volume_30m": item.get("volume_1h", 0),
-                "age_minutes": 999,  # API may not support timestamp
-                "contract_address": item.get("address"),
-                "chain": item.get("chain", "Solana"),
-                "source": "Birdeye",
-                "deployer": "N/A"
+                "volume_30m": item.get("volume", 0),
+                "age_minutes": 999,  # Age is unknown in this API
+                "contract_address": item.get("address", ""),
+                "deployer": item.get("creator", "unknown"),
+                "chain": "Ethereum"
             })
+
+        logger.info(f"Fetched {len(tokens)} Ethereum tokens")
         return tokens
+
     except Exception as e:
-        logger.error(f"Birdeye fetch failed: {e}")
+        logger.error(f"Failed to fetch Ethereum tokens: {e}")
         return []
-
-def calc_age_minutes(unix_timestamp):
-    if not unix_timestamp:
-        return 999
-    try:
-        now = datetime.now(timezone.utc)
-        token_time = datetime.fromtimestamp(unix_timestamp, tz=timezone.utc)
-        age = (now - token_time).total_seconds() / 60
-        return int(age)
-    except:
-        return 999
-
-def get_combined_tokens():
-    tokens = []
-    tokens.extend(fetch_from_pumpfun())
-    tokens.extend(fetch_from_birdeye())
-    return tokens
