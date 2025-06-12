@@ -1,3 +1,41 @@
+# -----------------------------------------
+# Filters for selecting “clean” memecoins
+# -----------------------------------------
 filters:
-  min_liquidity_usd: 5000
-  min_volume_1h_usd: 10000
+  min_liquidity_usd: 2000          # Minimum liquidity in USD
+  min_volume_1h_usd: 1000          # Minimum 1-hour trading volume (USD)
+  min_token_age_minutes: 10        # Token must be at least 10 minutes old
+  blacklist_tokens:
+    - scam
+    - rug
+    - test                         # Exclude tokens whose name contains these substrings
+  check_deployer: true             # Enable deployer reputation check via Etherscan
+  min_reputation_score: 5          # Minimum reputation score for deployer (0–10)
+
+# -----------------------------------------
+# Telegram (optional)
+# -----------------------------------------
+telegram:
+  bot_token: ""                    # Can override BOT_TOKEN from .env
+  admin_chat_id: 0                 # Can override CHAT_ID from .env
+
+# -----------------------------------------
+# Output settings (where generated content is saved)
+# -----------------------------------------
+output:
+  base_folder: "output"
+  bot_names:
+    - "solana_bot_1"
+    - "eth_bot_2"
+
+# -----------------------------------------
+# Scheduler settings (interval in seconds)
+# -----------------------------------------
+scheduler:
+  interval_seconds: 300
+
+# -----------------------------------------
+# Logging settings
+# -----------------------------------------
+logging:
+  level: "info"
