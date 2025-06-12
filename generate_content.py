@@ -1,4 +1,3 @@
-# generate_content.py
 import os
 from datetime import datetime
 import random
@@ -9,6 +8,7 @@ from parser.token_fetcher import fetch_new_tokens
 from reputation_checker import is_token_valid
 from poster import queue_for_zenno
 from utils.logger import logger
+
 
 def generate_chart(bot_name):
     logger.info(f"[{bot_name}] Generating BTC chart")
@@ -34,6 +34,7 @@ def generate_chart(bot_name):
     plt.close()
     logger.info(f"[{bot_name}] Chart saved: {out_path}")
 
+
 def generate_exchange_info(bot_name):
     logger.info(f"[{bot_name}] Generating ETH exchange info")
     cg = CoinGeckoAPI()
@@ -45,13 +46,16 @@ def generate_exchange_info(bot_name):
     filename = datetime.now().strftime("exchange_%Y%m%d_%H%M.txt")
     queue_for_zenno(bot_name, filename, text)
 
-def generate_memecoin_posts(bot_name, chain: str = "solana", top_n: int = 3):
+
+def sanitize_filename_component(text):
+    return "".join(c for c in text if c.isalnum() or c == "_")
+
+
+def generate_memecoin_posts(bot_name, chain="solana", top_n=3):
     logger.info(f"[{bot_name}] Fetching memecoins on {chain}")
     tokens = fetch_new_tokens(chain)
-    valid_tokens = []
-    for token in tokens:
-        if is_token_valid(token):
-            valid_tokens.append(token)
+    valid_tokens = [t for t in tokens if is_token_valid(t)]
+
     top_tokens = sorted(valid_tokens, key=lambda t: t["volume_30m"], reverse=True)[:top_n]
 
     for token in top_tokens:
@@ -59,8 +63,11 @@ def generate_memecoin_posts(bot_name, chain: str = "solana", top_n: int = 3):
             f"🔥 New memecoin on {chain.capitalize()}: ${token['ticker']} "
             f"— {token['volume_30m']:,}$ in last 30m! 🚀"
         )
-        filename = datetime.now().strftime(f"memecoin_{token['ticker']}_%Y%m%d_%H%M.txt")
+        safe_ticker = sanitize_filename_component(token['ticker'])
+        filename = datetime.now().strftime(f"memecoin_{safe_ticker}_%Y%m%d_%H%M.txt")
         queue_for_zenno(bot_name, filename, tweet)
+        logger.info(f"[{bot_name}] Generated post for ${token['ticker']}")
+
 
 def generate_comment(bot_name):
     logger.info(f"[{bot_name}] Generating meme-style comment")
