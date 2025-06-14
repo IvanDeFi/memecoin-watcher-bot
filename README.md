@@ -2,6 +2,8 @@
 
 A Python-based bot that automatically tracks new memecoins on the Solana and Ethereum blockchains, applies basic filtering, generates tweet-ready content (meme launches, charts, exchange updates, commentary), and can optionally post via multiple Twitter accounts (e.g. through ZennoPoster). It also supports Telegram-based notifications & moderation.
 
+Before running the bot, copy `.env.example` to `.env` and fill in your API keys and other credentials.
+
 ---
 
 ## 🚀 Features
