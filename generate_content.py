@@ -10,7 +10,7 @@ from poster import queue_for_zenno
 from utils.logger import logger
 
 
-def generate_chart(bot_name):
+def generate_and_queue_chart(bot_name):
     logger.info(f"[{bot_name}] Generating BTC chart")
     cg = CoinGeckoAPI()
     data = cg.get_coin_market_chart_by_id("bitcoin", vs_currency="usd", days=1)
@@ -35,7 +35,7 @@ def generate_chart(bot_name):
     logger.info(f"[{bot_name}] Chart saved: {out_path}")
 
 
-def generate_exchange_info(bot_name):
+def generate_and_queue_exchange_info(bot_name):
     logger.info(f"[{bot_name}] Generating ETH exchange info")
     cg = CoinGeckoAPI()
     data = cg.get_price(ids="ethereum", vs_currencies="usd", include_24hr_change="true")
@@ -51,7 +51,7 @@ def sanitize_filename_component(text):
     return "".join(c for c in text if c.isalnum() or c == "_")
 
 
-def generate_memecoin_posts(bot_name, chain="solana", top_n=3):
+def generate_and_queue_memecoin_tweet(bot_name, chain="solana", top_n=3):
     logger.info(f"[{bot_name}] Fetching memecoins on {chain}")
     tokens = fetch_new_tokens(chain)
     valid_tokens = [t for t in tokens if is_token_valid(t)]
@@ -69,7 +69,7 @@ def generate_memecoin_posts(bot_name, chain="solana", top_n=3):
         logger.info(f"[{bot_name}] Generated post for ${token['ticker']}")
 
 
-def generate_comment(bot_name):
+def generate_and_queue_comment(bot_name):
     logger.info(f"[{bot_name}] Generating meme-style comment")
     comments = [
         "🐸 Chart looks like it's heading Moonward! 🚀",
