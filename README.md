@@ -27,7 +27,11 @@ Before running the bot, copy `.env.example` to `.env` and fill in your API keys 
   4. **Commentary/Meme** – A short, engaging remark or meme-style comment (.txt).  
 
 - **Queue for Posting**  
-  Generated files (.png and .txt) are placed into output/{bot_name}/. A separate engine (e.g. ZennoPoster) can pick them up and publish them on Twitter in a human-like way.
+  Generated files (.png and .txt) are placed into `output/{bot_name}/`.
+  If `BOT_MODE` is set to `draft` and Telegram credentials are provided,
+  they go to `pending/{bot_name}/` instead and you receive a Telegram
+  notification. A separate engine (e.g. ZennoPoster) can pick them up
+  after approval.
 
 - **Multi-Account Support**  
   Designed to rotate posts across multiple Twitter/X accounts. Each account simply has its own subfolder under output/ (e.g. output/solana_bot_1/, output/eth_bot_2/).
@@ -125,7 +129,8 @@ INFURA_API_KEY=your_infura_api_key
 ETHERSCAN_API_KEY=your_etherscan_api_key
 
 # ----- Bot Behavior Settings -----
-BOT_MODE=post                    # "post" → publish via ZennoPoster, "draft" → save locally
+BOT_MODE=post                    # "post" → publish via ZennoPoster
+                                # "draft" → save to pending/ and notify Telegram
 SCHEDULE_INTERVAL=300            # In seconds (300 = 5 minutes)
 LOG_LEVEL=info                   # Fallback logging level if not set in config.yaml
 
@@ -375,7 +380,8 @@ If you prefer manual oversight:
 bash
    python telegram_bot.py
 
-2. Whenever generate_content.py places a new *.txt into pending/{bot_name}/, the bot sends you a message with inline buttons:
+2. Whenever `generate_content.py` places a new file into `pending/{bot_name}/`
+   (this happens when `BOT_MODE=draft`), the bot sends you a message with inline buttons:
    
 🆕 New post ready for solana_bot_1:
    pending/solana_bot_1/memecoin_20250606_1230.txt

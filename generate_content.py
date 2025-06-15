@@ -9,6 +9,12 @@ from parser.token_fetcher import fetch_new_tokens
 from reputation_checker import is_token_valid
 from poster import queue_for_zenno
 from utils.logger import logger
+from utils.settings import get_bot_mode, get_output_base_folder, has_telegram
+try:
+    from telegram_bot import notify_pending  # type: ignore
+except Exception:  # pragma: no cover - optional dependency
+    def notify_pending(*_args, **_kwargs):
+        pass
 
 
 def generate_and_queue_chart(bot_name):
@@ -30,11 +36,16 @@ def generate_and_queue_chart(bot_name):
     plt.tight_layout()
 
     filename = datetime.now().strftime("chart_%Y%m%d_%H%M.png")
-    out_path = os.path.join("output", bot_name, filename)
+    base_folder = get_output_base_folder()
+    if get_bot_mode() == "draft" and has_telegram():
+        base_folder = "pending"
+    out_path = os.path.join(base_folder, bot_name, filename)
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     plt.savefig(out_path)
     plt.close()
     logger.info(f"[{bot_name}] Chart saved: {out_path}")
+    if base_folder == "pending":
+        notify_pending(bot_name, out_path)
 
 
 def generate_and_queue_exchange_info(bot_name):
