@@ -30,6 +30,9 @@ def _safe_load(stream):
 yaml_mod.safe_load = lambda s: _safe_load(s)
 sys.modules.setdefault("yaml", yaml_mod)
 
+import utils.settings as settings
+settings._config_cache = None
+
 # Stub internal modules that rely on external services
 fetcher = types.ModuleType("token_fetcher")
 sample_tokens = [

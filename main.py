@@ -2,7 +2,7 @@
 import os
 import json
 from dotenv import load_dotenv
-import yaml
+from utils.settings import get_config
 
 from utils.logger import logger
 from generate_content import (
@@ -25,8 +25,8 @@ DEFAULT_CONTENT_CYCLE = [
 STATE_FILE = "state.json"
 
 def load_config():
-    with open("config.yaml", "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
+    """Return bot configuration."""
+    return get_config()
 
 def get_next_content_type(content_cycle):
     if not os.path.exists(STATE_FILE):

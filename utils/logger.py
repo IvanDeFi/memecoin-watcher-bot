@@ -1,6 +1,6 @@
 import os
 import logging
-import yaml
+from . import settings
 
 os.makedirs("logs", exist_ok=True)
 
@@ -8,8 +8,7 @@ os.makedirs("logs", exist_ok=True)
 def _get_log_level() -> str:
     """Determine log level from config.yaml or environment."""
     try:
-        with open("config.yaml", "r", encoding="utf-8") as f:
-            config = yaml.safe_load(f)
+        config = settings.get_config()
         level = config.get("logging", {}).get("level")
         if level:
             return level

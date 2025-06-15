@@ -18,6 +18,9 @@ setattr(matplotlib, "pyplot", plt)
 sys.modules.setdefault("matplotlib", matplotlib)
 sys.modules.setdefault("matplotlib.pyplot", plt)
 
+import utils.settings as settings
+settings._config_cache = None
+
 # Stub logger to avoid file writes
 logger_mod = types.ModuleType("logger")
 logger_mod.logger = types.SimpleNamespace(info=lambda *a, **k: None,
@@ -103,10 +106,7 @@ def test_generate_and_queue_memecoin_tweet(monkeypatch, tmp_path):
     monkeypatch.setattr(generate_content, "fetch_new_tokens", lambda c: tokens)
     monkeypatch.setattr(generate_content, "is_token_valid", lambda t, m=None: True)
 
-    def fake_open(*_a, **_k):
-        raise FileNotFoundError
-
-    monkeypatch.setattr(generate_content, "open", fake_open, raising=False)
+    monkeypatch.setattr(generate_content, "get_config", lambda: {})
 
     calls = []
 

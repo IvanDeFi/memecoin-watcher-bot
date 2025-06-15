@@ -6,6 +6,14 @@ except Exception:  # pragma: no cover - optional dependency
 
 _config_cache = None
 
+
+def get_config() -> dict:
+    """Return configuration loaded from ``config.yaml``.
+
+    The file is read only once and cached for subsequent calls.
+    """
+    return _load_config()
+
 def _load_config():
     global _config_cache
     if _config_cache is None:
