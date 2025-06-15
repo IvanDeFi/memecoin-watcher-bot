@@ -119,12 +119,12 @@ Below are clarifying questions that the developer should agree on before startin
 > Actual posting is done by ZennoPoster, which monitors the folder and publishes in order.
 ## 4. `tweet_generator.py` vs `generate_content.py`
 
-**The repository still contains `tweet_generator.py`, while the README refers to `generate_content.py`. Which one is canonical?**  
-> **Answer:** The canonical module is `generate_content.py`, as it includes the full logic for generating the four content types (charts, exchange updates, memecoin tweets, and comments).  
-> `tweet_generator.py` is a deprecated stub and can be removed after migrating any useful template logic it contains into `generate_content.py`.
+**The repository previously contained `tweet_generator.py`, while the README refers to `generate_content.py`. Which one is canonical?**
+> **Answer:** The canonical module is `generate_content.py`, as it includes the full logic for generating the four content types (charts, exchange updates, memecoin tweets, and comments).
+> `tweet_generator.py` was a deprecated stub and has been removed after migrating any useful template logic it contained into `generate_content.py`.
 
-**Can `tweet_generator.py` be safely deleted, or does it contain logic to preserve?**  
-> **Answer:** Yes, it can be deleted — but first migrate any reusable functions, such as:  
+**Can `tweet_generator.py` be safely deleted, or does it contain logic to preserve?**
+> **Answer:** Yes. It has now been deleted after migrating reusable functions, such as:
 > ```python
 > def format_memecoin_tweet(token):
 >     return f"🔥 New memecoin: ${token.symbol} — {token.volume:,}$ in last 30m!"
