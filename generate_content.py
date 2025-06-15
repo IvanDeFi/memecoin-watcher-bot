@@ -13,6 +13,7 @@ from utils.settings import (
     get_output_base_folder,
     has_telegram,
     get_config,
+    get_filters,
 )
 try:
     from telegram_bot import notify_pending  # type: ignore
@@ -82,8 +83,7 @@ def generate_and_queue_memecoin_tweet(bot_name, chain="solana", top_n=3):
     logger.info(f"[{bot_name}] Fetching memecoins on {chain}")
 
     try:
-        config = get_config()
-        filters = config.get("filters", {})
+        filters = get_filters()
     except Exception as e:
         logger.error(
             f"[{bot_name}] Failed to load filters from config.yaml: {e}"
