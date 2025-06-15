@@ -29,6 +29,11 @@ def generate_and_queue_chart(bot_name):
     symbol = chart_cfg.get("symbol", "bitcoin")
     vs_currency = chart_cfg.get("vs_currency", "usd")
     days = chart_cfg.get("days", 1)
+    width_px = chart_cfg.get("width_px", 1200)
+    height_px = chart_cfg.get("height_px", 675)
+    dpi = chart_cfg.get("dpi", 100)
+
+    figsize = (width_px / dpi, height_px / dpi)
 
     logger.info(f"[{bot_name}] Generating {symbol} chart")
     cg = CoinGeckoAPI()
@@ -40,7 +45,7 @@ def generate_and_queue_chart(bot_name):
     timestamps = [p[0] for p in prices]
     values = [p[1] for p in prices]
 
-    plt.figure(figsize=(6, 4))
+    plt.figure(figsize=figsize, dpi=dpi)
     plt.plot(timestamps, values)
     plt.title(f"{symbol.upper()} Price Last {days}d")
     plt.xlabel("Timestamp")

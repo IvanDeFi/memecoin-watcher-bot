@@ -177,6 +177,9 @@ chart:
   symbol: "bitcoin"               # Asset for the chart
   vs_currency: "usd"              # Quote currency
   days: 1                         # Time range in days
+  width_px: 1200                  # Chart width in pixels
+  height_px: 675                  # Chart height in pixels
+  dpi: 100                        # Resolution for Matplotlib
 
 scheduler:
   interval_seconds: 300           # Run `main.py` every 5 minutes
@@ -213,33 +216,37 @@ On each run, the bot reads a small JSON file named state.json to determine which
 
    BASE_OUTPUT = f"output/{bot_name}"
 
-   def generate_and_queue_chart():
-       os.makedirs(BASE_OUTPUT, exist_ok=True)
-       cg = CoinGeckoAPI()
-       config = get_config()
-       chart = config.get("chart", {})
-       data = cg.get_coin_market_chart_by_id(
-           chart.get("symbol", "bitcoin"),
-           vs_currency=chart.get("vs_currency", "usd"),
-           days=chart.get("days", 1),
-       )
-       prices = data["prices"]  # [[timestamp, price], ...]
-       timestamps = [p[0] for p in prices]
-       values = [p[1] for p in prices]
+    def generate_and_queue_chart():
+        os.makedirs(BASE_OUTPUT, exist_ok=True)
+        cg = CoinGeckoAPI()
+        config = get_config()
+        chart = config.get("chart", {})
+        data = cg.get_coin_market_chart_by_id(
+            chart.get("symbol", "bitcoin"),
+            vs_currency=chart.get("vs_currency", "usd"),
+            days=chart.get("days", 1),
+        )
+        prices = data["prices"]  # [[timestamp, price], ...]
+        timestamps = [p[0] for p in prices]
+        values = [p[1] for p in prices]
+        width_px = chart.get("width_px", 1200)
+        height_px = chart.get("height_px", 675)
+        dpi = chart.get("dpi", 100)
+        figsize = (width_px / dpi, height_px / dpi)
 
-       plt.figure(figsize=(6, 4))
-       plt.plot(timestamps, values)
-       plt.title(f"{chart.get('symbol','bitcoin').upper()} Price Last {chart.get('days',1)}d")
-       plt.xlabel("Timestamp")
-       plt.ylabel(f"Price ({chart.get('vs_currency','usd').upper()})")
-       plt.xticks(rotation=45)
-       plt.tight_layout()
+        plt.figure(figsize=figsize, dpi=dpi)
+        plt.plot(timestamps, values)
+        plt.title(f"{chart.get('symbol','bitcoin').upper()} Price Last {chart.get('days',1)}d")
+        plt.xlabel("Timestamp")
+        plt.ylabel(f"Price ({chart.get('vs_currency','usd').upper()})")
+        plt.xticks(rotation=45)
+        plt.tight_layout()
 
-       filename = datetime.now().strftime("chart_%Y%m%d_%H%M.png")
-       filepath = os.path.join(BASE_OUTPUT, filename)
-       plt.savefig(filepath)
-       plt.close()
-       print(f"✅ Chart generated: {filepath}")
+        filename = datetime.now().strftime("chart_%Y%m%d_%H%M.png")
+        filepath = os.path.join(BASE_OUTPUT, filename)
+        plt.savefig(filepath)
+        plt.close()
+        print(f"✅ Chart generated: {filepath}")
 ```
 
 2. **Exchange Update**  
