@@ -146,9 +146,10 @@ OUTPUT_BASE_FOLDER=output
 LOG_FILE=logs/bot.log
 
 
-> **Note:**  
-> - Leave any unused variables blank or unset.  
+> **Note:**
+> - Leave any unused variables blank or unset.
 > - The .env file is already listed in .gitignore, so it will not be accidentally pushed to GitHub.
+> - See [docs/API_KEYS.md](docs/API_KEYS.md) for which API keys are required and their typical rate limits.
 
 ---
 
