@@ -84,23 +84,26 @@ memecoin-watcher-bot/
 
 ## 📦 Installation
 
-1. **Clone the repository**  
-   
-bash
-   git clone https://github.com/IvanDeFi/memecoin-watcher-bot.git
-   cd memecoin-watcher-bot
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/IvanDeFi/memecoin-watcher-bot.git
+cd memecoin-watcher-bot
+```
 
 
-2. **Install Python dependencies**  
-   
-bash
-   pip install -r requirements.txt
+2. **Install Python dependencies**
+
+```bash
+pip install -r requirements.txt
+```
 
 
-3. **Copy the environment template**  
-   
-bash
-   cp .env.example .env
+3. **Copy the environment template**
+
+```bash
+cp .env.example .env
+```
 
 
 4. **Open .env and fill in your own keys/tokens** (see next section).
@@ -113,7 +116,7 @@ bash
 
 Create a local .env file (do **NOT** commit this to GitHub). Populate it with your own credentials:
 
-env
+```env
 # ----- Telegram (optional) -----
 TELEGRAM_BOT_TOKEN=your_telegram_bot_token
 TELEGRAM_CHAT_ID=your_chat_id
@@ -136,6 +139,7 @@ LOG_LEVEL=info                   # Fallback logging level if not set in config.y
 # ----- Proxy Settings (if needed) -----
 USE_PROXY=false
 PROXY_LIST=proxies.txt           # Path to a file with one proxy URL per line
+```
 > **Note:**
 > - Leave any unused variables blank or unset.
 > - The .env file is already listed in .gitignore, so it will not be accidentally pushed to GitHub.
@@ -147,7 +151,7 @@ PROXY_LIST=proxies.txt           # Path to a file with one proxy URL per line
 
 Example config.yaml in the repository root:
 
-yaml
+```yaml
 filters:
   min_liquidity_usd: 2000         # Minimum liquidity in USD for new tokens
   min_volume_1h_usd: 1000         # Minimum 1-hour trading volume (USD)
@@ -179,6 +183,7 @@ scheduler:
 
 logging:
   level: "info"                   # Logging verbosity (overrides LOG_LEVEL)
+```
 
 
 > **Tip:** Adjust the numeric thresholds and blacklists as you see fit for your risk tolerance.
@@ -198,8 +203,8 @@ On each run, the bot reads a small JSON file named state.json to determine which
    - Plot a line chart using Matplotlib (timestamps vs. price).  
    - Save as chart_{YYYYMMDD_HHMM}.png in output/{bot_name}/.
 
-   
-python
+
+```python
    from pycoingecko import CoinGeckoAPI
    import matplotlib.pyplot as plt
    from datetime import datetime
@@ -235,7 +240,7 @@ python
        plt.savefig(filepath)
        plt.close()
        print(f"✅ Chart generated: {filepath}")
-
+```
 
 2. **Exchange Update**  
    - Request the current price + 24 h % change for ETH from CoinGecko (or Binance).  
@@ -245,8 +250,8 @@ python
 
    - Save as exchange_{YYYYMMDD_HHMM}.txt in output/{bot_name}/.
 
-   
-python
+
+```python
    from pycoingecko import CoinGeckoAPI
    from datetime import datetime
    import os
@@ -266,20 +271,21 @@ python
        with open(filepath, "w", encoding="utf-8") as f:
            f.write(text)
        print(f"✅ Exchange info generated: {filepath}")
+```
 
+3. **Memecoin Launch** (three consecutive posts)
+   - Call fetch_new_tokens("solana") + fetch_new_tokens("ethereum") from your parser/ modules. Each returns a list of tokens with fields:
 
-3. **Memecoin Launch** (three consecutive posts)  
-   - Call fetch_new_tokens("solana") + fetch_new_tokens("ethereum") from your parser/ modules. Each returns a list of tokens with fields:  
-     
-python
+```python
      {
        "ticker": "DOGEPEPE",
        "liquidity": 5000,
        "volume_30m": 40000,
        "age_minutes": 15,
        "contract_address": "0x...",
-       "deployer": "0xCreatorAddress"
-     }
+    "deployer": "0xCreatorAddress"
+  }
+```
 
    - Apply filtering rules:
      - liquidity ≥ filters.min_liquidity_usd  
@@ -294,8 +300,8 @@ python
 
    - Save each as memecoin_{YYYYMMDD_HHMM}.txt under output/{bot_name}/.
 
-   
-python
+
+```python
    from datetime import datetime
    import os
 
@@ -314,23 +320,24 @@ python
        with open(filepath, "w", encoding="utf-8") as f:
            f.write(tweet_text)
        print(f"✅ Memecoin tweet generated: {filepath}")
-
+```
 
 4. **Commentary / Meme**  
    - Choose a random “meme-style” comment from a preloaded list:
      
-python
+```python
      comments = [
          "🐸 Chart looks like it's heading Moonward! 🚀",
          "🔮 Could this be the next big gem? Keep an eye on the charts!",
          "👀 DeFi whales are lurking… stay cautious. 🐋",
          "📊 That dip looks like a bull trap to me!",
-     ]
+    ]
 
    - Save into comment_{YYYYMMDD_HHMM}.txt in output/{bot_name}/.
 
-   
-python
+```
+
+```python
    import random
    from datetime import datetime
    import os
@@ -351,7 +358,7 @@ python
        with open(filepath, "w", encoding="utf-8") as f:
            f.write(text)
        print(f"✅ Comment generated: {filepath}")
-
+```
 
 After generating these six items (chart, exchange update, 3 memecoin posts, commentary), the cycle resets and repeats on the next scheduled run.
 
@@ -379,9 +386,10 @@ After generating these six items (chart, exchange update, 3 memecoin posts, comm
 If you prefer manual oversight:
 
 1. Start the Telegram bot:
-   
-bash
-   python telegram_bot.py
+
+```bash
+python telegram_bot.py
+```
 
 2. Whenever `generate_content.py` places a new file into `pending/{bot_name}/`
    (this happens when `BOT_MODE=draft`), the bot sends you a message with inline buttons:
@@ -396,7 +404,7 @@ bash
    - ZennoPoster will see it and post it automatically.  
    Press **🗑 Reject** to delete the file permanently.
 
-python
+```python
 # Example snippet (telegram_bot.py)
 from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import Updater, CallbackQueryHandler
@@ -446,7 +454,7 @@ if __name__ == "__main__":
 
 All processing steps and errors are recorded via a centralized logger (utils/logger.py). By default, logs are written to logs/bot.log.
 
-python
+```python
 # utils/logger.py
 import logging
 import os
@@ -468,29 +476,31 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
 
-In main.py or any module, use:
-python
+# In main.py or any module
 from utils.logger import logger
 
 logger.info("This is an info message")
 logger.error("This is an error message")
+```
 
 
 ---
 
 ## 🏗 Running the Bot
 
-1. **Manual Run (One Cycle)**  
-   
-bash
-   python main.py
+1. **Manual Run (One Cycle)**
+
+```bash
+python main.py
+```
 
    - Generates exactly one content item based on the current cycle position (chart → exchange → memecoin → memecoin → memecoin → comment → repeat).
 
 2. **Scheduled Run (Every 5 Minutes)**
 
-bash
-   python scheduler.py
+```bash
+python scheduler.py
+```
 
    - Uses the schedule library to call `main()` at the interval defined in `config.yaml` (default is 300 seconds).
    - Keeps the content rotation running indefinitely.
@@ -508,9 +518,10 @@ pytest
 ```
 
 3. **Telegram Moderation**
-   
-bash
-   python telegram_bot.py
+
+```bash
+python telegram_bot.py
+```
 
    - Listens for inline button presses (Publish/Reject) to move or delete files in pending/{bot_name}/.
 
@@ -531,19 +542,21 @@ output/solana_bot_1/sent/chart_20250606_1230.png
 
 ## 🔧 Installation & Setup Checklist
 
-1. **Clone + Install**  
-   
-bash
-   git clone https://github.com/IvanDeFi/memecoin-watcher-bot.git
-   cd memecoin-watcher-bot
-   pip install -r requirements.txt
+1. **Clone + Install**
+
+```bash
+git clone https://github.com/IvanDeFi/memecoin-watcher-bot.git
+cd memecoin-watcher-bot
+pip install -r requirements.txt
+```
 
 
-2. **Environment Variables**  
-   
-bash
-   cp .env.example .env
-   # Edit .env to add your own keys & tokens
+2. **Environment Variables**
+
+```bash
+cp .env.example .env
+# Edit .env to add your own keys & tokens
+```
 
 
 3. **Verify Directory Structure**  
@@ -578,16 +591,18 @@ bash
    - Add your Pump.fun, Birdeye, Dexscreener, Alchemy/Infura, Etherscan keys  
    - Set any other flags (e.g., BOT_MODE)
 
-5. **Run**  
-   - (Optional) Start the Telegram moderation bot:  
-     
-bash
-     python telegram_bot.py
+5. **Run**
+   - (Optional) Start the Telegram moderation bot:
 
-   - Start the scheduler (continuous operation):  
-     
-bash
-     python scheduler.py
+```bash
+python telegram_bot.py
+```
+
+   - Start the scheduler (continuous operation):
+
+```bash
+python scheduler.py
+```
 
 
 ---
