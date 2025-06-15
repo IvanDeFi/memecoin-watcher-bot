@@ -29,6 +29,7 @@ def load_config():
     return get_config()
 
 def get_next_content_type(content_cycle):
+    """Return the next content type and update the state file."""
     if not os.path.exists(STATE_FILE):
         with open(STATE_FILE, "w", encoding="utf-8") as f:
             json.dump({"index": 0}, f)
@@ -45,6 +46,7 @@ def get_next_content_type(content_cycle):
     return content_type
 
 def main():
+    """Run one iteration of the content generation workflow."""
     load_dotenv()
     logger.info("🚀 Memecoin Watcher Bot started.")
 

@@ -6,7 +6,7 @@ from utils.logger import logger
 from utils.settings import get_config
 
 def get_interval_from_config():
-    """Return scheduler interval from config."""
+    """Return the scheduler interval in seconds from config."""
     try:
         config = get_config()
         return config.get("scheduler", {}).get("interval_seconds", 300)
@@ -15,6 +15,7 @@ def get_interval_from_config():
         return 300  # fallback to 5 min
 
 def run_scheduler():
+    """Continuously run scheduled executions of the bot."""
     load_dotenv()
     interval = get_interval_from_config()
     logger.info(f"🔁 Scheduler started. Interval = {interval} seconds")
