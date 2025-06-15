@@ -35,6 +35,9 @@ chart:
   symbol: "bitcoin"
   vs_currency: "usd"
   days: 1
+  width_px: 1200
+  height_px: 675
+  dpi: 100
 
 # -----------------------------------------
 # Content rotation settings
