@@ -47,6 +47,7 @@ def fetch_new_tokens(chain: str) -> List[Dict[str, Any]]:
             or item.get("tokenAddress")
             or item.get("baseTokenAddress"),
             "deployer": item.get("deployer") or item.get("creator") or "unknown",
+            "chain": chain_l,
         }
         tokens.append(token)
 
