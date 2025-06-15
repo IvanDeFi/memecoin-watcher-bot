@@ -136,9 +136,13 @@ def test_generate_and_queue_memecoin_tweet(monkeypatch, tmp_path):
 
 
 def test_generate_and_queue_chart(monkeypatch, tmp_path):
+    captured = {}
+
     class FakeCG:
         def get_coin_market_chart_by_id(self, coin_id, vs_currency="usd", days=1):
-            assert coin_id == "bitcoin"
+            captured["coin_id"] = coin_id
+            captured["vs"] = vs_currency
+            captured["days"] = days
             return {"prices": [[1, 10], [2, 20]]}
 
     class FakePLT:
@@ -175,6 +179,7 @@ def test_generate_and_queue_chart(monkeypatch, tmp_path):
     monkeypatch.setattr(generate_content, "get_output_base_folder", lambda: str(tmp_path))
     monkeypatch.setattr(generate_content, "get_bot_mode", lambda: "post")
     monkeypatch.setattr(generate_content, "has_telegram", lambda: False)
+    monkeypatch.setattr(generate_content, "get_config", lambda: {"chart": {"symbol": "dogecoin", "vs_currency": "eur", "days": 7}})
     monkeypatch.setattr(generate_content, "datetime", DummyDT)
 
     generate_content.generate_and_queue_chart("bot1")
@@ -182,4 +187,5 @@ def test_generate_and_queue_chart(monkeypatch, tmp_path):
     expected = tmp_path / "bot1" / "chart_20230102_0304.png"
     assert fake_plt.saved == str(expected)
     assert (tmp_path / "bot1").is_dir()
+    assert captured == {"coin_id": "dogecoin", "vs": "eur", "days": 7}
 

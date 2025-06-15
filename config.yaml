@@ -29,6 +29,14 @@ output:
     - "eth_bot_2"
 
 # -----------------------------------------
+# Chart settings
+# -----------------------------------------
+chart:
+  symbol: "bitcoin"
+  vs_currency: "usd"
+  days: 1
+
+# -----------------------------------------
 # Content rotation settings
 # -----------------------------------------
 content_cycle:

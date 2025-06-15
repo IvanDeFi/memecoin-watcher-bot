@@ -22,10 +22,18 @@ except Exception:  # pragma: no cover - optional dependency
 
 
 def generate_and_queue_chart(bot_name):
-    """Generate a BTC price chart and queue it for posting."""
-    logger.info(f"[{bot_name}] Generating BTC chart")
+    """Generate a price chart and queue it for posting."""
+    config = get_config()
+    chart_cfg = config.get("chart", {})
+    symbol = chart_cfg.get("symbol", "bitcoin")
+    vs_currency = chart_cfg.get("vs_currency", "usd")
+    days = chart_cfg.get("days", 1)
+
+    logger.info(f"[{bot_name}] Generating {symbol} chart")
     cg = CoinGeckoAPI()
-    data = cg.get_coin_market_chart_by_id("bitcoin", vs_currency="usd", days=1)
+    data = cg.get_coin_market_chart_by_id(
+        symbol, vs_currency=vs_currency, days=days
+    )
     prices = data["prices"]
 
     timestamps = [p[0] for p in prices]
@@ -33,9 +41,9 @@ def generate_and_queue_chart(bot_name):
 
     plt.figure(figsize=(6, 4))
     plt.plot(timestamps, values)
-    plt.title("BTC Price Last 24h")
+    plt.title(f"{symbol.upper()} Price Last {days}d")
     plt.xlabel("Timestamp")
-    plt.ylabel("Price (USD)")
+    plt.ylabel(f"Price ({vs_currency.upper()})")
     plt.xticks(rotation=45)
     plt.tight_layout()
 

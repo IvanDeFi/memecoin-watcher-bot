@@ -179,6 +179,11 @@ output:
     - "solana_bot_1"
     - "eth_bot_2"
 
+chart:
+  symbol: "bitcoin"               # Asset for the chart
+  vs_currency: "usd"              # Quote currency
+  days: 1                         # Time range in days
+
 scheduler:
   interval_seconds: 300           # Run `main.py` every 5 minutes
 
@@ -209,22 +214,29 @@ python
    import matplotlib.pyplot as plt
    from datetime import datetime
    import os
+   from utils.settings import get_config
 
    BASE_OUTPUT = f"output/{bot_name}"
 
    def generate_and_queue_chart():
        os.makedirs(BASE_OUTPUT, exist_ok=True)
        cg = CoinGeckoAPI()
-       data = cg.get_coin_market_chart_by_id("bitcoin", vs_currency="usd", days=1)
+       config = get_config()
+       chart = config.get("chart", {})
+       data = cg.get_coin_market_chart_by_id(
+           chart.get("symbol", "bitcoin"),
+           vs_currency=chart.get("vs_currency", "usd"),
+           days=chart.get("days", 1),
+       )
        prices = data["prices"]  # [[timestamp, price], ...]
        timestamps = [p[0] for p in prices]
        values = [p[1] for p in prices]
 
        plt.figure(figsize=(6, 4))
        plt.plot(timestamps, values)
-       plt.title("BTC Price Last 24h")
+       plt.title(f"{chart.get('symbol','bitcoin').upper()} Price Last {chart.get('days',1)}d")
        plt.xlabel("Timestamp")
-       plt.ylabel("Price (USD)")
+       plt.ylabel(f"Price ({chart.get('vs_currency','usd').upper()})")
        plt.xticks(rotation=45)
        plt.tight_layout()
 
