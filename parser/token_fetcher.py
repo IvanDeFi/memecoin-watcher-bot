@@ -7,6 +7,9 @@ from utils.logger import logger
 PUMP_FUN_API_KEY = os.getenv("PUMP_FUN_API_KEY")
 BIRDEYE_API_KEY = os.getenv("BIRDEYE_API_KEY")
 
+# Default timeout for all outgoing API requests (in seconds)
+REQUEST_TIMEOUT = 10
+
 
 def fetch_new_tokens(chain: str):
     """
@@ -27,7 +30,7 @@ def fetch_solana_tokens():
     try:
         url = "https://client-api.pump.fun/tokens/trending"
         headers = {"x-api-key": PUMP_FUN_API_KEY} if PUMP_FUN_API_KEY else {}
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
         data = response.json()
 
@@ -49,6 +52,9 @@ def fetch_solana_tokens():
         logger.info(f"Fetched {len(tokens)} Solana tokens")
         return tokens
 
+    except requests.Timeout:
+        logger.error("Failed to fetch Solana tokens: request timed out")
+        return []
     except Exception as e:
         logger.error(f"Failed to fetch Solana tokens: {e}")
         return []
@@ -58,7 +64,7 @@ def fetch_ethereum_tokens():
     try:
         url = "https://public-api.birdeye.so/public/tokenlist?chain=ethereum"
         headers = {"X-API-KEY": BIRDEYE_API_KEY} if BIRDEYE_API_KEY else {}
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
         data = response.json().get("data", {}).get("tokens", [])
 
@@ -77,6 +83,9 @@ def fetch_ethereum_tokens():
         logger.info(f"Fetched {len(tokens)} Ethereum tokens")
         return tokens
 
+    except requests.Timeout:
+        logger.error("Failed to fetch Ethereum tokens: request timed out")
+        return []
     except Exception as e:
         logger.error(f"Failed to fetch Ethereum tokens: {e}")
         return []
