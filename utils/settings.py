@@ -15,6 +15,8 @@ def get_config() -> dict:
     return _load_config()
 
 def _load_config():
+    """Load and cache settings from ``config.yaml`` if present."""
+
     global _config_cache
     if _config_cache is None:
         try:
@@ -27,14 +29,20 @@ def _load_config():
     return _config_cache
 
 def get_bot_mode() -> str:
+    """Return the bot operation mode."""
+
     cfg = _load_config()
     return os.getenv("BOT_MODE") or cfg.get("bot_mode", "post")
 
 def get_output_base_folder() -> str:
+    """Return the directory used to store generated files."""
+
     cfg = _load_config()
     return cfg.get("output", {}).get("base_folder", "output")
 
 def has_telegram() -> bool:
+    """Return ``True`` if Telegram credentials are configured."""
+
     cfg = _load_config()
     token = os.getenv("TELEGRAM_BOT_TOKEN") or cfg.get("telegram", {}).get("bot_token")
     chat_id = os.getenv("TELEGRAM_CHAT_ID") or str(cfg.get("telegram", {}).get("admin_chat_id"))
