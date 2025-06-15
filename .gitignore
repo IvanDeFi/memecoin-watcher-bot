@@ -13,6 +13,9 @@ __pycache__/
 # Sessions, logs, outputs
 sessions/
 output/
+logs/
+pending/
+state.json
 *.log
 
 # Mac system files
