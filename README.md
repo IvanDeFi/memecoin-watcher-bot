@@ -477,6 +477,16 @@ bash
 bash
    python scheduler.py
 
+
+## 🧪 Testing
+
+The repository includes a small test suite in `tests/`. Run it with:
+
+```bash
+pip install -r requirements.txt  # installs pytest and other dependencies
+pytest
+```
+
    - Uses the schedule library to call main() every SCHEDULE_INTERVAL seconds (default = 300s).
    - Keeps the content rotation running indefinitely.
 
