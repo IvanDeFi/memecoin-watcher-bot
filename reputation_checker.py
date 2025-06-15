@@ -23,6 +23,10 @@ def is_token_valid(token: dict, min_reputation_score: Optional[int] = None) -> b
         return False
 
     score = get_deployer_reputation(deployer)
+    if score is None:
+        logger.warning("Could not retrieve deployer reputation, skipping check")
+        return True
+
     logger.info(f"[Reputation] {deployer} scored {score}/10")
 
     if min_reputation_score is None:
@@ -32,7 +36,7 @@ def is_token_valid(token: dict, min_reputation_score: Optional[int] = None) -> b
 
     return score >= min_score
 
-def get_deployer_reputation(address: str) -> int:
+def get_deployer_reputation(address: str) -> Optional[int]:
     """
     Estimates deployer reputation based on number of contracts created.
 
@@ -59,4 +63,4 @@ def get_deployer_reputation(address: str) -> int:
 
     except Exception as e:
         logger.error(f"Failed to retrieve deployer reputation: {e}")
-        return 0
+        return None
