@@ -485,25 +485,27 @@ bash
 
    - Generates exactly one content item based on the current cycle position (chart → exchange → memecoin → memecoin → memecoin → comment → repeat).
 
-2. **Scheduled Run (Every 5 Minutes)**  
-   
+2. **Scheduled Run (Every 5 Minutes)**
+
 bash
    python scheduler.py
 
+   - Uses the schedule library to call `main()` every `SCHEDULE_INTERVAL` seconds (default is 300).
+   - Keeps the content rotation running indefinitely.
 
 ## 🧪 Testing
 
-The repository includes a small test suite in `tests/`. Run it with:
+The repository includes a small test suite in `tests/`. To run it:
 
 ```bash
 pip install -r requirements.txt  # installs pytest and other dependencies
+# or install pytest directly
+pip install pytest
+
 pytest
 ```
 
-   - Uses the schedule library to call main() every SCHEDULE_INTERVAL seconds (default = 300s).
-   - Keeps the content rotation running indefinitely.
-
-3. **Telegram Moderation**  
+3. **Telegram Moderation**
    
 bash
    python telegram_bot.py
