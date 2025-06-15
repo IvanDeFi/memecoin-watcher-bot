@@ -5,8 +5,6 @@ import requests
 from typing import Optional
 from utils.logger import logger
 
-ETHERSCAN_API_KEY = os.getenv("ETHERSCAN_API_KEY")
-
 def is_token_valid(token: dict, min_reputation_score: Optional[int] = None) -> bool:
     """
     Checks if a token's deployer is reputable based on Etherscan data.
@@ -42,10 +40,11 @@ def get_deployer_reputation(address: str) -> int:
     Score = 10 - number of contract deployments (capped between 0–10)
     """
     try:
+        etherscan_api_key = os.getenv("ETHERSCAN_API_KEY")
         url = (
             f"https://api.etherscan.io/api"
             f"?module=account&action=txlist"
-            f"&address={address}&apikey={ETHERSCAN_API_KEY}"
+            f"&address={address}&apikey={etherscan_api_key}"
         )
         response = requests.get(url, timeout=10)
         response.raise_for_status()
