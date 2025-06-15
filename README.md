@@ -20,7 +20,7 @@ Before running the bot, copy `.env.example` to `.env` and fill in your API keys 
   - Deployer reputation (via Etherscan)
 
 - **Content Generation (Content Rotation)**  
-  For each run, the bot cycles through four types of posts:Add commentMore actions
+  For each run, the bot cycles through four types of posts:
   1. **Chart** – A 24-hour Bitcoin price chart saved as .png.  
   2. **Exchange Update** – A text summary of a major token’s price and 24h change (e.g. ETH), saved as .txt.  
   3. **Memecoin Launch** – Three separate text posts (.txt) about top new tokens (filtered by liquidity/volume).  
