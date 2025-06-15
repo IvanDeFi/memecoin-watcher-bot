@@ -20,3 +20,9 @@ state.json
 
 # Mac system files
 .DS_Store
+
+# Temporary and log outputs
+pending/
+output/
+logs/
+state.json
