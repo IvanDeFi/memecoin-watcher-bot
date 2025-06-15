@@ -61,6 +61,7 @@ def test_fetch_new_tokens_parses(monkeypatch):
             "age_minutes": 12,
             "contract_address": "0x1",
             "deployer": "0xD1",
+            "chain": "solana",
         }
     ]
 
