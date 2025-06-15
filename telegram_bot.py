@@ -11,13 +11,16 @@ load_dotenv()
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 ADMIN_CHAT_ID = int(os.getenv("TELEGRAM_CHAT_ID", "0"))
 
-bot = Bot(token=TELEGRAM_BOT_TOKEN)
+bot = Bot(token=TELEGRAM_BOT_TOKEN) if TELEGRAM_BOT_TOKEN else None
 
 def notify_pending(bot_name: str, filepath: str):
     """
     Sends a Telegram message to the admin for each pending post,
     allowing approval or rejection.
     """
+    if not bot:
+        return
+
     filename = os.path.basename(filepath)
     text = f"🆕 New post ready for *{bot_name}*:\n`{filename}`"
 
@@ -54,6 +57,10 @@ def handle_callback(update: Update, context: CallbackContext):
     query.answer()
 
 def start_telegram_bot():
+    if not TELEGRAM_BOT_TOKEN:
+        logging.warning("TELEGRAM_BOT_TOKEN not set. Telegram bot disabled.")
+        return
+
     updater = Updater(token=TELEGRAM_BOT_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CallbackQueryHandler(handle_callback))
