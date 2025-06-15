@@ -2,6 +2,8 @@ import os
 from datetime import datetime
 import random
 from pycoingecko import CoinGeckoAPI
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from parser.token_fetcher import fetch_new_tokens
