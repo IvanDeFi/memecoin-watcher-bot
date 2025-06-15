@@ -14,14 +14,21 @@ from generate_content import (
 # Optional: Telegram notification
 # from telegram_bot import notify_pending  
 
-CONTENT_CYCLE = ["chart", "exchange", "memecoin", "memecoin", "memecoin", "comment"]
+DEFAULT_CONTENT_CYCLE = [
+    "chart",
+    "exchange",
+    "memecoin",
+    "memecoin",
+    "memecoin",
+    "comment",
+]
 STATE_FILE = "state.json"
 
 def load_config():
     with open("config.yaml", "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
-def get_next_content_type():
+def get_next_content_type(content_cycle):
     if not os.path.exists(STATE_FILE):
         with open(STATE_FILE, "w", encoding="utf-8") as f:
             json.dump({"index": 0}, f)
@@ -29,8 +36,8 @@ def get_next_content_type():
     with open(STATE_FILE, "r+", encoding="utf-8") as f:
         data = json.load(f)
         idx = data.get("index", 0)
-        content_type = CONTENT_CYCLE[idx % len(CONTENT_CYCLE)]
-        data["index"] = (idx + 1) % len(CONTENT_CYCLE)
+        content_type = content_cycle[idx % len(content_cycle)]
+        data["index"] = (idx + 1) % len(content_cycle)
         f.seek(0)
         json.dump(data, f)
         f.truncate()
@@ -47,7 +54,8 @@ def main():
         logger.error(f"Failed to load config.yaml: {e}")
         return
 
-    content_type = get_next_content_type()
+    content_cycle = config.get("content_cycle", DEFAULT_CONTENT_CYCLE)
+    content_type = get_next_content_type(content_cycle)
     logger.info(f"Generating content: {content_type}")
 
     bot_names = config.get("output", {}).get("bot_names", [])
