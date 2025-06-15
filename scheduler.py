@@ -2,13 +2,13 @@ import time
 import schedule
 from dotenv import load_dotenv
 from main import main
-import yaml
 from utils.logger import logger
+from utils.settings import get_config
 
 def get_interval_from_config():
+    """Return scheduler interval from config."""
     try:
-        with open("config.yaml", "r", encoding="utf-8") as f:
-            config = yaml.safe_load(f)
+        config = get_config()
         return config.get("scheduler", {}).get("interval_seconds", 300)
     except Exception as e:
         logger.error(f"Failed to load schedule interval from config.yaml: {e}")

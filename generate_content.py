@@ -3,13 +3,17 @@ from datetime import datetime
 import random
 from pycoingecko import CoinGeckoAPI
 import matplotlib.pyplot as plt
-import yaml
 
 from parser.token_fetcher import fetch_new_tokens
 from reputation_checker import is_token_valid
 from poster import queue_for_zenno
 from utils.logger import logger
-from utils.settings import get_bot_mode, get_output_base_folder, has_telegram
+from utils.settings import (
+    get_bot_mode,
+    get_output_base_folder,
+    has_telegram,
+    get_config,
+)
 try:
     from telegram_bot import notify_pending  # type: ignore
 except Exception:  # pragma: no cover - optional dependency
@@ -70,11 +74,12 @@ def generate_and_queue_memecoin_tweet(bot_name, chain="solana", top_n=3):
     logger.info(f"[{bot_name}] Fetching memecoins on {chain}")
 
     try:
-        with open("config.yaml", "r", encoding="utf-8") as f:
-            config = yaml.safe_load(f)
+        config = get_config()
         filters = config.get("filters", {})
     except Exception as e:
-        logger.error(f"[{bot_name}] Failed to load filters from config.yaml: {e}")
+        logger.error(
+            f"[{bot_name}] Failed to load filters from config.yaml: {e}"
+        )
         filters = {}
 
     min_liq = filters.get("min_liquidity_usd", 0)
