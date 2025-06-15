@@ -31,8 +31,18 @@ fetcher.fetch_new_tokens = lambda chain: []
 sys.modules["parser.token_fetcher"] = fetcher
 
 reputation = types.ModuleType("reputation_checker")
-reputation.is_token_valid = lambda token: True
+reputation.is_token_valid = lambda token, min_score=None: True
 sys.modules["reputation_checker"] = reputation
+
+# Provide minimal YAML stub
+yaml_mod = types.ModuleType("yaml")
+yaml_mod.safe_load = lambda s: {}
+sys.modules["yaml"] = yaml_mod
+
+# Stub telegram bot module used by poster
+telegram_bot_mod = types.ModuleType("telegram_bot")
+telegram_bot_mod.notify_pending = lambda *a, **k: None
+sys.modules.setdefault("telegram_bot", telegram_bot_mod)
 
 # Ensure we load the real poster module, not the stub from other tests
 sys.modules.pop("poster", None)
@@ -83,7 +93,7 @@ def test_generate_and_queue_exchange_info(monkeypatch):
     assert captured['text'] == "\U0001F4E2 ETH price is $1234.56 (24h: -2.50%)"
 
 
-def test_generate_and_queue_memecoin_tweet(monkeypatch):
+def test_generate_and_queue_memecoin_tweet(monkeypatch, tmp_path):
     tokens = [
         {"ticker": "GOOD1", "volume_30m": 1000, "chain": "Solana"},
         {"ticker": "EVIL$", "volume_30m": 3000, "chain": "Solana"},
@@ -91,7 +101,12 @@ def test_generate_and_queue_memecoin_tweet(monkeypatch):
     ]
 
     monkeypatch.setattr(generate_content, "fetch_new_tokens", lambda c: tokens)
-    monkeypatch.setattr(generate_content, "is_token_valid", lambda t: True)
+    monkeypatch.setattr(generate_content, "is_token_valid", lambda t, m=None: True)
+
+    def fake_open(*_a, **_k):
+        raise FileNotFoundError
+
+    monkeypatch.setattr(generate_content, "open", fake_open, raising=False)
 
     calls = []
 
