@@ -15,6 +15,16 @@ sys.modules["pycoingecko"].CoinGeckoAPI = object
 matplotlib = types.ModuleType("matplotlib")
 plt = types.ModuleType("pyplot")
 setattr(matplotlib, "pyplot", plt)
+plt.figure = lambda *a, **k: None
+plt.plot = lambda *a, **k: None
+plt.title = lambda *a, **k: None
+plt.xlabel = lambda *a, **k: None
+plt.ylabel = lambda *a, **k: None
+plt.xticks = lambda *a, **k: None
+plt.tight_layout = lambda *a, **k: None
+plt.savefig = lambda path, *a, **k: open(path, "wb").close()
+plt.close = lambda *a, **k: None
+matplotlib.use = lambda *a, **k: None
 sys.modules.setdefault("matplotlib", matplotlib)
 sys.modules.setdefault("matplotlib.pyplot", plt)
 
@@ -133,4 +143,27 @@ def test_generate_and_queue_memecoin_tweet(monkeypatch, tmp_path):
 
     assert calls[1][1] == "memecoin_ANOTHER_20230102_0304.txt"
     assert calls[1][2].startswith("\U0001F525 New memecoin on Solana: $ANOTHER")
+
+
+def test_generate_and_queue_chart(monkeypatch, tmp_path):
+    class FakeCG:
+        def get_coin_market_chart_by_id(self, *a, **k):
+            return {"prices": [[1, 2], [2, 3]]}
+
+    fixed_dt = datetime(2023, 1, 2, 3, 4)
+
+    class DummyDT(datetime):
+        @classmethod
+        def now(cls):
+            return fixed_dt
+
+    monkeypatch.setattr(generate_content, "CoinGeckoAPI", lambda: FakeCG())
+    monkeypatch.setattr(generate_content, "get_output_base_folder", lambda: str(tmp_path))
+    monkeypatch.setattr(generate_content, "get_bot_mode", lambda: "normal")
+    monkeypatch.setattr(generate_content, "datetime", DummyDT)
+
+    generate_content.generate_and_queue_chart("bot1")
+
+    out_file = tmp_path / "bot1" / "chart_20230102_0304.png"
+    assert out_file.exists()
 

@@ -12,6 +12,16 @@ sys.modules["pycoingecko"].CoinGeckoAPI = object
 matplotlib = types.ModuleType("matplotlib")
 plt = types.ModuleType("pyplot")
 setattr(matplotlib, "pyplot", plt)
+plt.figure = lambda *a, **k: None
+plt.plot = lambda *a, **k: None
+plt.title = lambda *a, **k: None
+plt.xlabel = lambda *a, **k: None
+plt.ylabel = lambda *a, **k: None
+plt.xticks = lambda *a, **k: None
+plt.tight_layout = lambda *a, **k: None
+plt.savefig = lambda path, *a, **k: open(path, "wb").close()
+plt.close = lambda *a, **k: None
+matplotlib.use = lambda *a, **k: None
 sys.modules.setdefault("matplotlib", matplotlib)
 sys.modules.setdefault("matplotlib.pyplot", plt)
 
