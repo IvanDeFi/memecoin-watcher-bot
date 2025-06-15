@@ -29,6 +29,17 @@ output:
     - "eth_bot_2"
 
 # -----------------------------------------
+# Content rotation settings
+# -----------------------------------------
+content_cycle:
+  - chart
+  - exchange
+  - memecoin
+  - memecoin
+  - memecoin
+  - comment
+
+# -----------------------------------------
 # Scheduler settings (interval in seconds)
 # -----------------------------------------
 scheduler:
