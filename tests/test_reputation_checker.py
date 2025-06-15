@@ -43,3 +43,25 @@ def test_is_token_valid_checks_eth(monkeypatch):
     token = {"chain": "Ethereum", "deployer": "0xA"}
     assert reputation_checker.is_token_valid(token, min_reputation_score=5)
     assert called == ["0xA"]
+
+
+def test_is_token_valid_skips_on_error(monkeypatch):
+    monkeypatch.setattr(reputation_checker, "get_deployer_reputation", lambda a: None)
+
+    token = {"chain": "Ethereum", "deployer": "0xB"}
+    assert reputation_checker.is_token_valid(token, min_reputation_score=5)
+
+
+def test_get_deployer_reputation_network_error(monkeypatch):
+    class DummyExc(Exception):
+        pass
+
+    def fake_get(*a, **k):
+        raise DummyExc("boom")
+
+    requests_stub = types.ModuleType("requests")
+    requests_stub.get = fake_get
+    monkeypatch.setattr(reputation_checker, "requests", requests_stub)
+
+    rep = reputation_checker.get_deployer_reputation("0xC")
+    assert rep is None
