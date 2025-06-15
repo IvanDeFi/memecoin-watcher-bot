@@ -589,6 +589,11 @@ If you run into issues or have feature ideas, please open an issue or pull reque
 
 For quick discussion or questions, find me on Telegram: [@Mr_Robot_7_7_7](https://t.me/Mr_Robot_7_7_7)
 
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+
 ---
 
 **Thank you for using Memecoin Watcher Bot!** 🚀  
