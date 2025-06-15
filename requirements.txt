@@ -4,3 +4,4 @@ schedule
 matplotlib
 python-dotenv
 python-telegram-bot
+pycoingecko
