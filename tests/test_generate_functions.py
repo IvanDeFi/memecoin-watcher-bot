@@ -106,7 +106,7 @@ def test_generate_and_queue_memecoin_tweet(monkeypatch, tmp_path):
     monkeypatch.setattr(generate_content, "fetch_new_tokens", lambda c: tokens)
     monkeypatch.setattr(generate_content, "is_token_valid", lambda t, m=None: True)
 
-    monkeypatch.setattr(generate_content, "get_config", lambda: {})
+    monkeypatch.setattr(generate_content, "get_filters", lambda: {})
 
     calls = []
 

@@ -40,6 +40,13 @@ def get_output_base_folder() -> str:
     cfg = _load_config()
     return cfg.get("output", {}).get("base_folder", "output")
 
+
+def get_filters() -> dict:
+    """Return filtering options from the cached configuration."""
+
+    cfg = _load_config()
+    return cfg.get("filters", {})
+
 def has_telegram() -> bool:
     """Return ``True`` if Telegram credentials are configured."""
 
