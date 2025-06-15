@@ -131,21 +131,11 @@ ETHERSCAN_API_KEY=your_etherscan_api_key
 # ----- Bot Behavior Settings -----
 BOT_MODE=post                    # "post" → publish via ZennoPoster
                                 # "draft" → save to pending/ and notify Telegram
-SCHEDULE_INTERVAL=300            # In seconds (300 = 5 minutes)
 LOG_LEVEL=info                   # Fallback logging level if not set in config.yaml
-
-# ----- Multi-Account Support -----
-TWITTER_ACCOUNTS=solana_bot_1,eth_bot_2   # Comma-separated account folder names
 
 # ----- Proxy Settings (if needed) -----
 USE_PROXY=false
 PROXY_LIST=proxies.txt           # Path to a file with one proxy URL per line
-
-# ----- Paths (override defaults if desired) -----
-OUTPUT_BASE_FOLDER=output
-LOG_FILE=logs/bot.log
-
-
 > **Note:**
 > - Leave any unused variables blank or unset.
 > - The .env file is already listed in .gitignore, so it will not be accidentally pushed to GitHub.
@@ -502,7 +492,7 @@ bash
 bash
    python scheduler.py
 
-   - Uses the schedule library to call `main()` every `SCHEDULE_INTERVAL` seconds (default is 300).
+   - Uses the schedule library to call `main()` at the interval defined in `config.yaml` (default is 300 seconds).
    - Keeps the content rotation running indefinitely.
 
 ## 🧪 Testing
@@ -586,7 +576,7 @@ bash
 4. **Fill .env**  
    - Add your Telegram bot token & chat ID  
    - Add your Pump.fun, Birdeye, Dexscreener, Alchemy/Infura, Etherscan keys  
-   - Set any other flags (BOT_MODE, SCHEDULE_INTERVAL, etc.)
+   - Set any other flags (e.g., BOT_MODE)
 
 5. **Run**  
    - (Optional) Start the Telegram moderation bot:  
