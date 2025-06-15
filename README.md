@@ -127,7 +127,7 @@ ETHERSCAN_API_KEY=your_etherscan_api_key
 # ----- Bot Behavior Settings -----
 BOT_MODE=post                    # "post" → publish via ZennoPoster, "draft" → save locally
 SCHEDULE_INTERVAL=300            # In seconds (300 = 5 minutes)
-LOG_LEVEL=info                   # Logging level: debug / info / warning / error
+LOG_LEVEL=info                   # Fallback logging level if not set in config.yaml
 
 # ----- Multi-Account Support -----
 TWITTER_ACCOUNTS=solana_bot_1,eth_bot_2   # Comma-separated account folder names
@@ -177,7 +177,7 @@ scheduler:
   interval_seconds: 300           # Run `main.py` every 5 minutes
 
 logging:
-  level: "info"                   # Logging verbosity
+  level: "info"                   # Logging verbosity (overrides LOG_LEVEL)
 
 
 > **Tip:** Adjust the numeric thresholds and blacklists as you see fit for your risk tolerance.
@@ -441,11 +441,17 @@ python
 # utils/logger.py
 import logging
 import os
+import yaml
 
 os.makedirs("logs", exist_ok=True)
 
+with open("config.yaml", "r", encoding="utf-8") as f:
+    cfg = yaml.safe_load(f)
+
+level = cfg.get("logging", {}).get("level") or os.getenv("LOG_LEVEL", "INFO")
+
 logger = logging.getLogger("memecoin-watcher")
-logger.setLevel(os.getenv("LOG_LEVEL", "INFO").upper())
+logger.setLevel(level.upper())
 
 formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 file_handler = logging.FileHandler("logs/bot.log", encoding="utf-8")
