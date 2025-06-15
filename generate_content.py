@@ -3,6 +3,7 @@ from datetime import datetime
 import random
 from pycoingecko import CoinGeckoAPI
 import matplotlib.pyplot as plt
+import yaml
 
 from parser.token_fetcher import fetch_new_tokens
 from reputation_checker import is_token_valid
@@ -56,8 +57,36 @@ def sanitize_filename_component(text):
 def generate_and_queue_memecoin_tweet(bot_name, chain="solana", top_n=3):
     """Post about trending memecoins on the specified chain."""
     logger.info(f"[{bot_name}] Fetching memecoins on {chain}")
+
+    try:
+        with open("config.yaml", "r", encoding="utf-8") as f:
+            config = yaml.safe_load(f)
+        filters = config.get("filters", {})
+    except Exception as e:
+        logger.error(f"[{bot_name}] Failed to load filters from config.yaml: {e}")
+        filters = {}
+
+    min_liq = filters.get("min_liquidity_usd", 0)
+    min_vol = filters.get("min_volume_1h_usd", 0)
+    min_age = filters.get("min_token_age_minutes", 0)
+    blacklist = [b.lower() for b in filters.get("blacklist_tokens", [])]
+    min_rep = filters.get("min_reputation_score", 5)
+
     tokens = fetch_new_tokens(chain)
-    valid_tokens = [t for t in tokens if is_token_valid(t)]
+
+    def passes_filters(token):
+        if token.get("liquidity", 0) < min_liq:
+            return False
+        if token.get("volume_30m", 0) < min_vol:
+            return False
+        if token.get("age_minutes", 0) < min_age:
+            return False
+        ticker = token.get("ticker", "").lower()
+        if any(bl in ticker for bl in blacklist):
+            return False
+        return is_token_valid(token, min_rep)
+
+    valid_tokens = [t for t in tokens if passes_filters(t)]
 
     top_tokens = sorted(valid_tokens, key=lambda t: t["volume_30m"], reverse=True)[:top_n]
 
@@ -67,7 +96,9 @@ def generate_and_queue_memecoin_tweet(bot_name, chain="solana", top_n=3):
             f"— {token['volume_30m']:,}$ in last 30m! 🚀"
         )
         safe_ticker = sanitize_filename_component(token['ticker'])
-        filename = datetime.now().strftime(f"memecoin_{safe_ticker}_%Y%m%d_%H%M.txt")
+        filename = datetime.now().strftime(
+            f"memecoin_{safe_ticker}_%Y%m%d_%H%M.txt"
+        )
         queue_for_zenno(bot_name, filename, tweet)
         logger.info(f"[{bot_name}] Generated post for ${token['ticker']}")
 

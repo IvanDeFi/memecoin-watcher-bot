@@ -2,11 +2,12 @@
 
 import os
 import requests
+from typing import Optional
 from utils.logger import logger
 
 ETHERSCAN_API_KEY = os.getenv("ETHERSCAN_API_KEY")
 
-def is_token_valid(token: dict) -> bool:
+def is_token_valid(token: dict, min_reputation_score: Optional[int] = None) -> bool:
     """
     Checks if a token's deployer is reputable based on Etherscan data.
     Currently applies only to Ethereum tokens.
@@ -25,8 +26,12 @@ def is_token_valid(token: dict) -> bool:
 
     score = get_deployer_reputation(deployer)
     logger.info(f"[Reputation] {deployer} scored {score}/10")
-    
-    min_score = int(os.getenv("MIN_REPUTATION_SCORE", "5"))
+
+    if min_reputation_score is None:
+        min_score = int(os.getenv("MIN_REPUTATION_SCORE", "5"))
+    else:
+        min_score = int(min_reputation_score)
+
     return score >= min_score
 
 def get_deployer_reputation(address: str) -> int:
