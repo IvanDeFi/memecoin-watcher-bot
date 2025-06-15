@@ -134,3 +134,52 @@ def test_generate_and_queue_memecoin_tweet(monkeypatch, tmp_path):
     assert calls[1][1] == "memecoin_ANOTHER_20230102_0304.txt"
     assert calls[1][2].startswith("\U0001F525 New memecoin on Solana: $ANOTHER")
 
+
+def test_generate_and_queue_chart(monkeypatch, tmp_path):
+    class FakeCG:
+        def get_coin_market_chart_by_id(self, coin_id, vs_currency="usd", days=1):
+            assert coin_id == "bitcoin"
+            return {"prices": [[1, 10], [2, 20]]}
+
+    class FakePLT:
+        def __init__(self):
+            self.saved = None
+        def figure(self, *a, **k):
+            pass
+        def plot(self, *a, **k):
+            pass
+        def title(self, *a, **k):
+            pass
+        def xlabel(self, *a, **k):
+            pass
+        def ylabel(self, *a, **k):
+            pass
+        def xticks(self, *a, **k):
+            pass
+        def tight_layout(self):
+            pass
+        def savefig(self, path):
+            self.saved = path
+        def close(self):
+            pass
+
+    fixed_dt = datetime(2023, 1, 2, 3, 4)
+    class DummyDT(datetime):
+        @classmethod
+        def now(cls):
+            return fixed_dt
+
+    fake_plt = FakePLT()
+    monkeypatch.setattr(generate_content, "CoinGeckoAPI", lambda: FakeCG())
+    monkeypatch.setattr(generate_content, "plt", fake_plt)
+    monkeypatch.setattr(generate_content, "get_output_base_folder", lambda: str(tmp_path))
+    monkeypatch.setattr(generate_content, "get_bot_mode", lambda: "post")
+    monkeypatch.setattr(generate_content, "has_telegram", lambda: False)
+    monkeypatch.setattr(generate_content, "datetime", DummyDT)
+
+    generate_content.generate_and_queue_chart("bot1")
+
+    expected = tmp_path / "bot1" / "chart_20230102_0304.png"
+    assert fake_plt.saved == str(expected)
+    assert (tmp_path / "bot1").is_dir()
+
