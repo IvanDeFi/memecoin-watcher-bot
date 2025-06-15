@@ -7,7 +7,12 @@ from utils.settings import (
     get_output_base_folder,
     has_telegram,
 )
-from telegram_bot import notify_pending
+try:
+    from telegram_bot import notify_pending  # type: ignore
+except Exception:  # pragma: no cover - optional dependency
+    def notify_pending(*_args, **_kwargs):
+        """Fallback when telegram_bot is unavailable."""
+        pass
 
 def queue_for_zenno(bot_name, filename, text, base_folder=None):
     """
