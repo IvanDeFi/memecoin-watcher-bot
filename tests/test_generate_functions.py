@@ -220,3 +220,38 @@ def test_generate_and_queue_comment(monkeypatch):
         "text": "two",
     }
 
+
+def test_generate_and_queue_comment_saves(tmp_path, monkeypatch):
+    captured = {}
+
+    orig_queue = queue_for_zenno
+
+    def fake_queue(bot, fname, text):
+        captured["bot"] = bot
+        captured["fname"] = fname
+        captured["text"] = text
+        orig_queue(bot, fname, text, base_folder=str(tmp_path))
+
+    fixed_dt = datetime(2023, 1, 2, 3, 4)
+
+    class DummyDT(datetime):
+        @classmethod
+        def now(cls):
+            return fixed_dt
+
+    monkeypatch.setattr(generate_content, "queue_for_zenno", fake_queue)
+    monkeypatch.setattr(generate_content.random, "choice", lambda seq: "hi")
+    monkeypatch.setattr(generate_content, "datetime", DummyDT)
+
+    generate_content.generate_and_queue_comment("botB")
+
+    assert captured == {
+        "bot": "botB",
+        "fname": "comment_20230102_0304.txt",
+        "text": "hi",
+    }
+
+    out_file = tmp_path / "botB" / "comment_20230102_0304.txt"
+    assert out_file.exists()
+    assert out_file.read_text(encoding="utf-8") == "hi"
+
