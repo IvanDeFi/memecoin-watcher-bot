@@ -186,6 +186,7 @@ scheduler:
 
 logging:
   level: "info"                   # Logging verbosity (overrides LOG_LEVEL)
+http_timeout: 10                 # Timeout for API requests in seconds
 ```
 
 

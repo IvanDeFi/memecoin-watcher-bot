@@ -2,6 +2,7 @@ import requests
 from typing import List, Dict, Any
 
 from utils.logger import logger
+from utils.settings import get_config
 
 
 def fetch_new_tokens(chain: str) -> List[Dict[str, Any]]:
@@ -22,8 +23,11 @@ def fetch_new_tokens(chain: str) -> List[Dict[str, Any]]:
     else:
         raise ValueError(f"Unsupported chain: {chain}")
 
+    config = get_config()
+    timeout = config.get("http_timeout", 10)
+
     try:
-        resp = requests.get(url, params=params, timeout=10)
+        resp = requests.get(url, params=params, timeout=timeout)
         resp.raise_for_status()
         data = resp.json()
     except Exception as exc:  # pragma: no cover - network failures
