@@ -17,7 +17,7 @@ Before running the bot, copy `.env.example` to `.env` and fill in your API keys 
   - Minimum 1-hour trading volume (USD)  
   - Token age (e.g. ≥ 10 minutes)  
   - Blacklisted keywords (e.g. “scam”, “rug”, “test”)  
-  - Deployer reputation (via Etherscan)
+  - Deployer reputation (via Etherscan or Solscan)
 
 - **Content Generation (Content Rotation)**  
   For each run, the bot cycles through four types of posts:
@@ -130,6 +130,8 @@ INFURA_API_KEY=your_infura_api_key
 
 # Reputation Checker (Ethereum)
 ETHERSCAN_API_KEY=your_etherscan_api_key
+# Reputation Checker (Solana)
+SOLSCAN_API_KEY=your_solscan_api_key
 
 # ----- Bot Behavior Settings -----
 BOT_MODE=post                    # "post" → publish via ZennoPoster
@@ -160,7 +162,7 @@ filters:
     - scam
     - rug
     - test                       # Reject any token whose name contains these substrings
-  check_deployer: true            # Enable deployer reputation check via Etherscan
+  check_deployer: true            # Enable deployer reputation check via Etherscan/Solscan
   min_reputation_score: 5         # Minimum reputation score (0–10)
 
 telegram:
@@ -602,7 +604,7 @@ cp .env.example .env
 
 4. **Fill .env**  
    - Add your Telegram bot token & chat ID  
-   - Add your Pump.fun, Birdeye, Dexscreener, Alchemy/Infura, Etherscan keys  
+   - Add your Pump.fun, Birdeye, Dexscreener, Alchemy/Infura, Etherscan/Solscan keys
    - Set any other flags (e.g., BOT_MODE)
 
 5. **Run**
@@ -631,7 +633,7 @@ python scheduler.py
   logs/
   __pycache__/
 
-- Periodically rotate keys (especially for Etherscan, Alchemy/Infura).  
+ - Periodically rotate keys (especially for Etherscan, Solscan, Alchemy/Infura).
 - If using proxies, store them in proxies.txt (and also ignore that file in Git).  
 - Run on a secure VPS (Windows, if using ZennoPoster) or Linux (for pure Python/Flask/Telegram).
 

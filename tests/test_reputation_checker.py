@@ -21,14 +21,27 @@ sys.modules.pop("reputation_checker", None)
 import reputation_checker
 
 
-def test_is_token_valid_skips_non_eth(monkeypatch):
+def test_is_token_valid_skips_non_supported_chain(monkeypatch):
     called = []
     monkeypatch.setattr(reputation_checker, "get_deployer_reputation",
                         lambda addr: called.append(addr) or 10)
 
-    token = {"chain": "solana", "deployer": "0xD"}
+    token = {"chain": "cardano", "deployer": "0xD"}
     assert reputation_checker.is_token_valid(token, min_reputation_score=5)
     assert called == []
+
+
+def test_is_token_valid_checks_solana(monkeypatch):
+    called = []
+    monkeypatch.setattr(
+        reputation_checker,
+        "get_deployer_reputation_solana",
+        lambda addr: called.append(addr) or 7,
+    )
+
+    token = {"chain": "solana", "deployer": "SoA"}
+    assert reputation_checker.is_token_valid(token, min_reputation_score=5)
+    assert called == ["SoA"]
 
 
 def test_is_token_valid_checks_eth(monkeypatch):
@@ -64,4 +77,19 @@ def test_get_deployer_reputation_network_error(monkeypatch):
     monkeypatch.setattr(reputation_checker, "requests", requests_stub)
 
     rep = reputation_checker.get_deployer_reputation("0xC")
+    assert rep is None
+
+
+def test_get_deployer_reputation_solana_network_error(monkeypatch):
+    class DummyExc(Exception):
+        pass
+
+    def fake_get(*a, **k):
+        raise DummyExc("boom")
+
+    requests_stub = types.ModuleType("requests")
+    requests_stub.get = fake_get
+    monkeypatch.setattr(reputation_checker, "requests", requests_stub)
+
+    rep = reputation_checker.get_deployer_reputation_solana("SoX")
     assert rep is None
