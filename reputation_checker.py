@@ -14,15 +14,19 @@ def is_token_valid(token: dict, min_reputation_score: Optional[int] = None) -> b
     - The chain is not Ethereum (skip check)
     - The deployer has a good reputation score (>= threshold)
     """
-    if token.get("chain", "").lower() != "ethereum":
-        return True  # Only Ethereum tokens are checked
+    chain = token.get("chain", "").lower()
+    if chain not in ("ethereum", "solana"):
+        return True  # Only Ethereum and Solana tokens are checked
 
     deployer = token.get("deployer")
     if not deployer or deployer == "unknown":
         logger.warning("Token missing deployer address.")
         return False
 
-    score = get_deployer_reputation(deployer)
+    if chain == "solana":
+        score = get_deployer_reputation_solana(deployer)
+    else:
+        score = get_deployer_reputation(deployer)
     if score is None:
         logger.warning("Could not retrieve deployer reputation, skipping check")
         return True
@@ -63,4 +67,21 @@ def get_deployer_reputation(address: str) -> Optional[int]:
 
     except Exception as e:
         logger.error(f"Failed to retrieve deployer reputation: {e}")
+        return None
+
+
+def get_deployer_reputation_solana(address: str) -> Optional[int]:
+    """Estimate deployer reputation for Solana based on token creations."""
+    try:
+        api_key = os.getenv("SOLSCAN_API_KEY")
+        url = f"https://api.solscan.io/account/tokens?address={address}"
+        headers = {"token": api_key} if api_key else {}
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        tokens = data.get("data", [])
+        score = 10 - len(tokens)
+        return max(0, min(score, 10))
+    except Exception as e:
+        logger.error(f"Failed to retrieve Solana deployer reputation: {e}")
         return None
