@@ -1,8 +1,10 @@
 # main.py
 import os
 import json
+from pathlib import Path
 from dotenv import load_dotenv
 from utils.settings import get_config
+from filelock import FileLock
 
 from utils.logger import logger
 from generate_content import (
@@ -30,18 +32,21 @@ def load_config():
 
 def get_next_content_type(content_cycle):
     """Return the next content type and update the state file."""
-    if not os.path.exists(STATE_FILE):
-        with open(STATE_FILE, "w", encoding="utf-8") as f:
-            json.dump({"index": 0}, f)
+    lock_path = STATE_FILE + ".lock"
+    Path(lock_path).touch(exist_ok=True)
+    with FileLock(lock_path):
+        if not os.path.exists(STATE_FILE):
+            with open(STATE_FILE, "w", encoding="utf-8") as f:
+                json.dump({"index": 0}, f)
 
-    with open(STATE_FILE, "r+", encoding="utf-8") as f:
-        data = json.load(f)
-        idx = data.get("index", 0)
-        content_type = content_cycle[idx % len(content_cycle)]
-        data["index"] = (idx + 1) % len(content_cycle)
-        f.seek(0)
-        json.dump(data, f)
-        f.truncate()
+        with open(STATE_FILE, "r+", encoding="utf-8") as f:
+            data = json.load(f)
+            idx = data.get("index", 0)
+            content_type = content_cycle[idx % len(content_cycle)]
+            data["index"] = (idx + 1) % len(content_cycle)
+            f.seek(0)
+            json.dump(data, f)
+            f.truncate()
 
     return content_type
 
