@@ -6,4 +6,4 @@ python-dotenv
 python-telegram-bot
 pycoingecko
 pytest
-filelock
+filelock>=3.13
