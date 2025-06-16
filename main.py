@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from dotenv import load_dotenv
 from utils.settings import get_config
-from filelock import FileLock
+import filelock
 
 from utils.logger import logger
 from generate_content import (
@@ -34,7 +34,7 @@ def get_next_content_type(content_cycle):
     """Return the next content type and update the state file."""
     lock_path = STATE_FILE + ".lock"
     Path(lock_path).touch(exist_ok=True)
-    with FileLock(lock_path):
+    with filelock.FileLock(lock_path):
         if not os.path.exists(STATE_FILE):
             with open(STATE_FILE, "w", encoding="utf-8") as f:
                 json.dump({"index": 0}, f)
