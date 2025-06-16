@@ -330,18 +330,19 @@ On each run, the bot reads a small JSON file named state.json to determine which
        print(f"✅ Memecoin tweet generated: {filepath}")
 ```
 
-4. **Commentary / Meme**  
-   - Choose a random “meme-style” comment from a preloaded list:
-     
-```python
-     comments = [
-         "🐸 Chart looks like it's heading Moonward! 🚀",
-         "🔮 Could this be the next big gem? Keep an eye on the charts!",
-         "👀 DeFi whales are lurking… stay cautious. 🐋",
-         "📊 That dip looks like a bull trap to me!",
-    ]
+4. **Commentary / Meme**
+   - Comments are loaded from the ``comments`` section of ``config.yaml``. If the section is missing, a default list is used.
 
-   - Save into comment_{YYYYMMDD_HHMM}.txt in output/{bot_name}/.
+```python
+   # config.yaml
+   comments:
+     - "🐸 Chart looks like it's heading Moonward! 🚀"
+     - "🔮 Could this be the next big gem? Keep an eye on the charts!"
+     - "👀 DeFi whales are lurking… stay cautious. 🐋"
+     - "📊 That dip looks like a bull trap to me!"
+
+   # generate_and_queue_comment will pick one at random and save it into
+   # comment_{YYYYMMDD_%H%M}.txt under output/{bot_name}/.
 
 ```
 
@@ -350,13 +351,18 @@ On each run, the bot reads a small JSON file named state.json to determine which
    from datetime import datetime
    import os
 
-   BASE_OUTPUT = f"output/{bot_name}"
-   comments = [
-       "🐸 Chart looks like it's heading Moonward! 🚀",
-       "🔮 Could this be the next big gem? Keep an eye on the charts!",
-       "👀 DeFi whales are lurking… stay cautious. 🐋",
-       "📊 That dip looks like a bull trap to me!",
-   ]
+    BASE_OUTPUT = f"output/{bot_name}"
+    from utils.settings import get_config
+
+    comments = get_config().get(
+        "comments",
+        [
+            "🐸 Chart looks like it's heading Moonward! 🚀",
+            "🔮 Could this be the next big gem? Keep an eye on the charts!",
+            "👀 DeFi whales are lurking… stay cautious. 🐋",
+            "📊 That dip looks like a bull trap to me!",
+        ],
+    )
 
    def generate_and_queue_comment():
        os.makedirs(BASE_OUTPUT, exist_ok=True)
