@@ -28,6 +28,23 @@ gc_mod.generate_and_queue_memecoin_tweet = lambda *a, **k: None
 gc_mod.generate_and_queue_comment = lambda *a, **k: None
 sys.modules.setdefault("generate_content", gc_mod)
 
+# Stub filelock to avoid external dependency
+filelock_mod = types.ModuleType("filelock")
+
+class DummyLock:
+    def __init__(self, path):
+        # create the lock file if it doesn't exist
+        open(path, "a").close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        pass
+
+filelock_mod.FileLock = DummyLock
+sys.modules.setdefault("filelock", filelock_mod)
+
 import main
 
 
