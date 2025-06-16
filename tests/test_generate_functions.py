@@ -189,3 +189,34 @@ def test_generate_and_queue_chart(monkeypatch, tmp_path):
     assert (tmp_path / "bot1").is_dir()
     assert captured == {"coin_id": "dogecoin", "vs": "eur", "days": 7}
 
+
+def test_generate_and_queue_comment(monkeypatch):
+    captured = {}
+
+    def fake_queue(bot, fname, text):
+        captured["bot"] = bot
+        captured["filename"] = fname
+        captured["text"] = text
+
+    fixed_dt = datetime(2023, 1, 2, 3, 4)
+
+    class DummyDT(datetime):
+        @classmethod
+        def now(cls):
+            return fixed_dt
+
+    monkeypatch.setattr(generate_content, "queue_for_zenno", fake_queue)
+    monkeypatch.setattr(
+        generate_content, "get_config", lambda: {"comments": ["one", "two"]}
+    )
+    monkeypatch.setattr(generate_content.random, "choice", lambda seq: seq[-1])
+    monkeypatch.setattr(generate_content, "datetime", DummyDT)
+
+    generate_content.generate_and_queue_comment("botA")
+
+    assert captured == {
+        "bot": "botA",
+        "filename": "comment_20230102_0304.txt",
+        "text": "two",
+    }
+

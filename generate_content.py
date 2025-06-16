@@ -135,12 +135,16 @@ def generate_and_queue_memecoin_tweet(bot_name, chain="solana", top_n=3):
 def generate_and_queue_comment(bot_name):
     """Queue a random meme-like comment for posting."""
     logger.info(f"[{bot_name}] Generating meme-style comment")
-    comments = [
-        "🐸 Chart looks like it's heading Moonward! 🚀",
-        "🔮 Could this be the next big gem? Keep an eye on the charts!",
-        "👀 DeFi whales are lurking… stay cautious. 🐋",
-        "📊 That dip looks like a bull trap to me!",
-    ]
+    config = get_config()
+    comments = config.get(
+        "comments",
+        [
+            "🐸 Chart looks like it's heading Moonward! 🚀",
+            "🔮 Could this be the next big gem? Keep an eye on the charts!",
+            "👀 DeFi whales are lurking… stay cautious. 🐋",
+            "📊 That dip looks like a bull trap to me!",
+        ],
+    )
     text = random.choice(comments)
     filename = datetime.now().strftime("comment_%Y%m%d_%H%M.txt")
     queue_for_zenno(bot_name, filename, text)

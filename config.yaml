@@ -40,6 +40,15 @@ chart:
   dpi: 100
 
 # -----------------------------------------
+# Comment templates
+# -----------------------------------------
+comments:
+  - "🐸 Chart looks like it's heading Moonward! 🚀"
+  - "🔮 Could this be the next big gem? Keep an eye on the charts!"
+  - "👀 DeFi whales are lurking… stay cautious. 🐋"
+  - "📊 That dip looks like a bull trap to me!"
+
+# -----------------------------------------
 # Content rotation settings
 # -----------------------------------------
 content_cycle:
